@@ -1,4 +1,4 @@
-// src/validation/matches.js
+// src/validation/matches.ts
 import { z } from 'zod';
 
 /**

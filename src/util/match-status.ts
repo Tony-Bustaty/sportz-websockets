@@ -1,6 +1,5 @@
 import { matches } from "./../db/schema.ts";
 import { MATCH_STATUS } from "../validation/matches.ts";
-import z from "zod";
 type MatchStatus = (typeof MATCH_STATUS)[keyof typeof MATCH_STATUS];
 export function getMatchStatus(
   startTime: string,
@@ -27,7 +26,7 @@ export function getMatchStatus(
 
 export async function syncMatchStatus(
   match: typeof matches.$inferSelect,
-  updateStatus: (status: MatchStatus) => z.infer<typeof matches>,
+  updateStatus: (status: MatchStatus) => typeof matches.$inferSelect,
 ) {
   const nextStatus = getMatchStatus(
     match.startTime.toString(),
