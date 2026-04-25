@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import { matchesRouter } from './routes/matches.ts';
 
 const app = express();
 
@@ -9,7 +10,7 @@ app.use(express.json());
 app.get('/', (req: Request, res: Response) => {
   res.send('Server is running smoothly with TypeScript + ES modules');
 });
-
+app.use("/matches",matchesRouter)
 // Start server
 const PORT = 8090;
 app.listen(PORT, () => {
