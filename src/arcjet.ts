@@ -48,6 +48,6 @@ export function securityMiddleware(){
         console.log("Arcjet middleware error",error);
         return res.status(503).json({error:"Service unavailable"})
     }
-    next();
+    return next();
    } 
 }
