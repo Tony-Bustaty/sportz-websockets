@@ -1,6 +1,7 @@
 import WebSocket, { WebSocketServer } from "ws";
 import * as http from "http";
 import { matches } from "../db/schema.ts";
+import { wsArcjet } from "../arcjet.ts";
 declare module "ws" {
   interface WebSocket {
     isAlive?: boolean;
@@ -28,7 +29,21 @@ export function attachWebSocketServer(server: http.Server) {
     path: "/ws",
     maxPayload: 1024 * 1024,
   });
-  wss.on("connection", (socket) => {
+  wss.on("connection",async (socket,req) => {
+    if(wsArcjet){
+      try {
+        const decision= await wsArcjet.protect(req);
+        if(decision.isDenied()){
+          const code =decision.reason.isRateLimit()?1013:1008;
+          const reason=decision.reason.isRateLimit()?"Rate Limit Exceed":"Access denied";
+          socket.close(code,reason);
+          return;
+        }
+      } catch (error) {
+        console.error("ws connection error",error)
+        socket.close(1011,'Server security error');
+      }
+    }
     SendJson(socket, { type: "welcome" });
     socket.on("error", console.error);
     socket.isAlive = true;
