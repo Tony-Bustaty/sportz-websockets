@@ -89,30 +89,30 @@ export function attachWebSocketServer(server: http.Server) {
     path: "/ws",
     maxPayload: 1024 * 1024,
   });
-  // server.on("upgrade", async (req, socket, head) => {
-  //   if (wsArcjet) {
-  //     try {
-  //       const decision = await wsArcjet.protect(req);
-  //       if (decision.isDenied()) {
-  //         if (decision.reason.isRateLimit()) {
-  //           socket.write("HTTP/1.1 429 Too many Requests\r\n\r\n");
-  //         } else {
-  //           socket.write("HTTP/1.1 403 Forbidden\r\n\r\n");
-  //           socket.destroy();
-  //           return;
-  //         }
-  //       }
-  //     } catch (error) {
-  //       console.error("ws upgrade protection connection error", error);
-  //       socket.write("HTTP/1.1 500 Internal Server Error\r\n\r\n");
-  //       socket.destroy();
-  //       return;
-  //     }
-  //   }
-  //   wss.handleUpgrade(req, socket, head, (ws) => {
-  //     wss.emit("connection", ws, req);
-  //   });
-  // });
+  server.on("upgrade", async (req, socket, head) => {
+    if (wsArcjet) {
+      try {
+        const decision = await wsArcjet.protect(req);
+        if (decision.isDenied()) {
+          if (decision.reason.isRateLimit()) {
+            socket.write("HTTP/1.1 429 Too many Requests\r\n\r\n");
+          } else {
+            socket.write("HTTP/1.1 403 Forbidden\r\n\r\n");
+            socket.destroy();
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("ws upgrade protection connection error", error);
+        socket.write("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+        socket.destroy();
+        return;
+      }
+    }
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      wss.emit("connection", ws, req);
+    });
+  });
   wss.on("connection", async (socket, req) => {
     SendJson(socket, { type: "welcome" });
     socket.on("error", console.error);

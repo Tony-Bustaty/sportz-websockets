@@ -19,7 +19,7 @@ app.use(express.json());
 app.get("/", (req: Request, res: Response) => {
   res.send("Server is running smoothly with TypeScript + ES modules");
 });
-// app.use(securityMiddleware());  
+app.use(securityMiddleware());  
 app.use("/matches", matchesRouter);
 app.use("/matches/:id/commentary", commentaryRouter);
 
